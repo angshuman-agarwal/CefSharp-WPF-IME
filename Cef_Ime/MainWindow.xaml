@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Cef_Ime.IME"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="IME Testing with CEFSHARP" Height="350" Width="525">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -14,15 +14,5 @@
         <local:ChromiumWebBrowserIMESupport Grid.Row="0"
                           x:Name="Browser"
                           Address="http://www.google.com" />
-        <StatusBar Grid.Row="1">
-            <ProgressBar HorizontalAlignment="Right"
-                         IsIndeterminate="{Binding WebBrowser.IsLoading}"
-                         Width="100"
-                         Height="16"
-                         Margin="3" />
-            <Separator />
-            <!-- TODO: Could show hover link URL here -->
-            <TextBlock />
-        </StatusBar>
     </Grid>
 </Window>
