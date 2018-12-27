@@ -1,17 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using CefSharp.Structs;
 using CefSharp.Wpf;
-
-
-using CefSharp.Internals;
-using CefSharp.Wpf.Rendering;
 using CefSharp;
 using System.Windows.Threading;
 
