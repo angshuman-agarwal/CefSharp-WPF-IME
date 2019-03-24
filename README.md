@@ -6,3 +6,6 @@ The [CEFSHARP](https://github.com/cefsharp/CefSharp) code needs to be changed to
 
  [@Antoyo's](https://github.com/Antonyo/CefSharp/tree/IME_Support) code is a great start and needs further polishing because the 
  [IME Candidate Window](https://github.com/cefsharp/CefSharp/issues/1262#issuecomment-450226821) is not getting set correctly.
+ 
+ **UPDATE**
+ Fixed it here now  https://github.com/angshuman-agarwal/CEFSHAPRP_WPF/tree/ime_candidate_window_fix
