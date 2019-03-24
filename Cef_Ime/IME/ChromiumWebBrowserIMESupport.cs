@@ -6,6 +6,7 @@ using System.Windows.Media;
 using CefSharp.Wpf;
 using CefSharp;
 using System.Windows.Threading;
+using CefSharp.Structs;
 
 namespace Cef_Ime.IME
 {
@@ -45,13 +46,13 @@ namespace Cef_Ime.IME
                     FrameworkPropertyMetadataOptions.Inherits));
         }
 
-        protected override void OnImeCompositionRangeChanged(Range selectedRange, CefSharp.Rect[] characterBounds)
+        protected override void OnImeCompositionRangeChanged(Range selectedRange, CefSharp.Structs.Rect[] characterBounds)
         {
             var imeKeyboardHandler = WpfKeyboardHandler as IMEWpfKeyboardHandler;
             if (imeKeyboardHandler.IsActive)
             {
                 var screenInfo = GetScreenInfo();
-                var scaleFactor = screenInfo.ScaleFactor > 0 ? screenInfo.ScaleFactor  : 1.0f;
+                var scaleFactor = screenInfo.Value.DeviceScaleFactor > 0 ? screenInfo.Value.DeviceScaleFactor : 1.0f;
 
                 UiThreadRunAsync(() =>
                 {
@@ -59,10 +60,10 @@ namespace Cef_Ime.IME
                     if (parentWindow != null)
                     {
                         var point = TransformToAncestor(parentWindow).Transform(new System.Windows.Point(0, 0));
-                        var rects = new List<CefSharp.Rect>();
+                        var rects = new List<CefSharp.Structs.Rect>();
 
                         foreach (var item in characterBounds)
-                            rects.Add(new CefSharp.Rect(
+                            rects.Add(new CefSharp.Structs.Rect(
                                 (int)((point.X + item.X) * scaleFactor),
                                 (int)((point.Y + item.Y) * scaleFactor),
                                 (int)(item.Width * scaleFactor),

@@ -1,4 +1,5 @@
 ﻿using CefSharp;
+using CefSharp.Structs;
 using CefSharp.Wpf;
 using CefSharp.Wpf.Internals;
 using System;
@@ -21,8 +22,8 @@ namespace Cef_Ime.IME
         bool _isDisposed;
         int _cursorIndex;
         Range _compositionRange;
-        CefSharp.Rect _imeRect = new CefSharp.Rect(-1, -1, 0, 0);
-        List<CefSharp.Rect> _compositionBounds = new List<CefSharp.Rect>();
+        CefSharp.Structs.Rect _imeRect = new CefSharp.Structs.Rect(-1, -1, 0, 0);
+        List<CefSharp.Structs.Rect> _compositionBounds = new List<CefSharp.Structs.Rect>();
         HwndSource _source;
         IntPtr _defaultContext;
         IntPtr _browserContext;
@@ -146,7 +147,7 @@ namespace Cef_Ime.IME
             {
                 if (handler.GetResult((uint)lParam, out text))
                 {
-                    _owner.GetBrowserHost().ImeCommitText(text);
+                    _owner.GetBrowserHost().ImeCommitText(text, new Range(Int32.MaxValue, Int32.MaxValue), 0);
                     return;
                 }
             }
@@ -158,7 +159,7 @@ namespace Cef_Ime.IME
 
                 if (handler.GetComposition((uint)lParam, underlines, ref compositionStart, out text))
                 {
-                    _owner.GetBrowserHost().ImeSetComposition(text, underlines.ToArray(), new Range(compositionStart, compositionStart));
+                    _owner.GetBrowserHost().ImeSetComposition(text, underlines.ToArray(), new Range(Int32.MaxValue, Int32.MaxValue),  new Range(compositionStart, compositionStart));
 
                     UpdateCaretPosition(compositionStart - 1);
                 }
@@ -224,7 +225,7 @@ namespace Cef_Ime.IME
             if (!_owner.IsFocused)
                 return;
 
-            CefSharp.Rect rc = _imeRect;
+            CefSharp.Structs.Rect rc = _imeRect;
             int location = _cursorIndex;
 
             // If location is not specified fall back to the composition range start.
@@ -261,9 +262,10 @@ namespace Cef_Ime.IME
                     }
                 };
 
+                // TODO :: candidate window for Chinese
                 using (var handler = IMEHandler.Create(hwnd))
                 {
-                    NativeIME.ImmSetCompositionWindow(handler._hIMC, ref formPoint);
+                    //NativeIME.ImmSetCompositionWindow(handler._hIMC, ref formPoint);
                 }
             }
 
@@ -279,11 +281,27 @@ namespace Cef_Ime.IME
             }
 
             if (_languageCodeId == NativeIME.LANG_KOREAN)
-                rc = new CefSharp.Rect(rc.X, rc.Y + caretMargin, rc.Width, rc.Height);
+                rc = new CefSharp.Structs.Rect(rc.X, rc.Y + caretMargin, rc.Width, rc.Height);
 
-            var form = new NativeIME.TagCompositionForm
+            // Japanese IMEs and Korean IMEs also use the rectangle given to
+            // ::ImmSetCandidateWindow() with its 'dwStyle' parameter CFS_EXCLUDE
+            // Therefore, we also set this parameter here.
+
+            //Referred from : https://bitbucket.org/chromiumembedded/cef/src/af349ade330c33b669c9ad61cd5000c140968fd7/tests/cefclient/browser/osr_ime_handler_win.cc?at=master&fileviewer=file-view-default#osr_ime_handler_win.cc-206
+            /*
+                CANDIDATEFORM exclude_rectangle = {
+                0,
+                CFS_EXCLUDE,
+                {rc.x, rc.y},
+                {rc.x, rc.y, rc.x + rc.width, rc.y + rc.height}};
+                ::ImmSetCandidateWindow(imc, &exclude_rectangle);
+
+                ::ImmReleaseContext(hwnd_, imc);
+            */
+
+            var candidateForm = new NativeIME.TagCandidateForm
             {
-                DwStyle = NativeIME.CFS_RECT,
+                DwStyle = NativeIME.CFS_EXCLUDE,
                 PtCurrentPos = new NativeIME.TagPoint
                 {
                     X = rc.X,
@@ -299,8 +317,10 @@ namespace Cef_Ime.IME
             };
 
             using (var handler = IMEHandler.Create(hwnd))
-                NativeIME.ImmSetCompositionWindow(handler._hIMC, ref form);
-        }
+            {
+                NativeIME.ImmSetCandidateWindow(handler._hIMC, ref candidateForm);
+            }
+    }
 
         private void DestroyImeWindow(IntPtr hwnd)
         {
@@ -311,7 +331,7 @@ namespace Cef_Ime.IME
             }
         }
 
-        internal void ChangeCompositionRange(Range selectionRange, List<CefSharp.Rect> bounds)
+        internal void ChangeCompositionRange(Range selectionRange, List<CefSharp.Structs.Rect> bounds)
         {
             _compositionRange = selectionRange;
             _compositionBounds = bounds;

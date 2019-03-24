@@ -45,6 +45,8 @@ namespace Cef_Ime.IME
         internal const uint CFS_DEFAULT = 0x0000;
         internal const uint CFS_RECT = 0x0001;
         internal const uint CFS_POINT = 0x0002;
+        internal const uint CFS_EXCLUDE = 0x0080;
+
         internal const uint CFS_FORCE_POSITION = 0x0020;
 
         internal const uint LANG_JAPANESE = 0x11;
@@ -116,6 +118,16 @@ namespace Cef_Ime.IME
         [SuppressUnmanagedCodeSecurity]
         [DllImport("imm32.dll")]
         internal static extern int ImmSetCompositionWindow(IntPtr hIMC, ref TagCompositionForm lpCompForm);
+
+
+        /// <SecurityNote>
+        ///     Critical:This code causes an elevation of privilige to unmanaged code
+        /// </SecurityNote>
+        [SecurityCritical]
+        [SuppressUnmanagedCodeSecurity]
+        [DllImport("imm32.dll", CharSet = CharSet.Auto)]
+        internal static extern int ImmSetCandidateWindow(IntPtr hIMC, ref TagCandidateForm candform);
+
 
         [DllImport("user32.dll")]
         internal static extern bool CreateCaret(IntPtr hWnd, IntPtr hBitmap, int nWidth, int nHeight);
