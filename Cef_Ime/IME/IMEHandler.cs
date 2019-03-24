@@ -1,4 +1,5 @@
 ﻿using CefSharp;
+using CefSharp.Structs;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,8 +10,8 @@ namespace Cef_Ime.IME
 {
     public class IMEHandler : IDisposable
     {
-        internal const uint ColorUNDERLINE = 0xFFFFFFFF;   // Black SkColor value for underline,
-        internal const uint ColorBKCOLOR = 0xFF000000;    // White SkColor value for background,
+        internal const uint ColorUNDERLINE = 0xFF000000;   // Black SkColor value for underline,
+        internal const uint ColorBKCOLOR = 0xFFFFFFFF;    // White SkColor value for background,
 
         internal IntPtr _hIMC;
         IntPtr _hWnd;
